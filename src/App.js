@@ -28,9 +28,11 @@ class App extends Component {
     
 
     return (
-      <div className="App">
-        <Header onResults={this.setResults}></Header>
-        <Results results={this.state.results}></Results>
+      <div className="App pure-g">
+        <div className="pure-u-1">
+          <Header onResults={this.setResults}></Header>
+          <Results results={this.state.results}></Results>
+        </div>
       </div>
     );
   }
@@ -40,14 +42,16 @@ class App extends Component {
 class Header extends Component {
   render() {
     return (
-      <div className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <div>
+      <div className="App-header pure-g">
+        <div className="pure-u-1">
+          <img src={logo} className="App-logo" alt="logo" />
           <div>
-            <h2>Wikipedia viewer</h2>
-            <small>Powered by React</small>
+            <div>
+              <h2>Wikipedia viewer</h2>
+              <small>Powered by React</small>
+            </div>
+            <Search onResults={this.props.onResults}></Search>
           </div>
-          <Search onResults={this.props.onResults}></Search>
         </div>
       </div>
     );
@@ -58,15 +62,24 @@ class Search extends Component {
   constructor(props) {
     super(props);
 
+    this.state = {
+      loading: false
+    }
+
     this.handleInput = this.handleInput.bind(this);
-    this.searchArticle = debounce(800, this.searchArticle );
+    this.searchArticle = debounce(500, this.searchArticle );
   }
 
   handleInput(e) {
     this.searchArticle(e.target.value);
+    
   }
 
   searchArticle(input) {
+    this.setState({
+      loading: true
+    });
+
     const baseUrl = "https://en.wikipedia.org/w/api.php";
 
 
@@ -87,20 +100,36 @@ class Search extends Component {
         gsrsearch: input
       }
     }).then( (results)  => {
+      console.log(results);
       if ( !results.data.query ) {
         results.data.query = {};
         results.data.query.pages = {};
       }
       const resultadosBusqueda = Object.assign({}, results.data.query.pages );
       this.props.onResults(resultadosBusqueda);
+      this.setState({
+        loading: false
+      });
     }).catch( (error) => {
       throw Error(error);
     })
   }
 
+  isLoading() {
+    return this.state.loading ? "loading" : "";
+  }
+
+  goToRandomArticle() {
+    window.location.replace("https://en.wikipedia.org/wiki/Special:Random"); 
+  }
+
   render() {
     return(
-      <input placeholder="Search article" id="searchInput" onInput={this.handleInput} />
+      <div>
+        <input className={this.isLoading()} placeholder="Search article" id="searchInput" onInput={this.handleInput} />
+        <p>or</p>
+        <button onClick={this.goToRandomArticle.bind(this)} className="pure-button">Go to random article</button>
+      </div>
     );
   }
 }
@@ -108,18 +137,24 @@ class Search extends Component {
 class Results extends Component {
   render() {
     var results = this.props.results;
-    console.log(results);
+    //console.log(results);
     var arrResults = Object.keys(results).map( function(val) {
       return results[val];
     });
     
     arrResults = arrResults.map( function(e,i) {
-      return <SingleResult key={e.pageid} extract={e.extract} title={e.title} thumbnail={e.thumbnail}></SingleResult>
+      return <SingleResult key={i} pageid={e.pageid} extract={e.extract} title={e.title} thumbnail={e.thumbnail}></SingleResult>
     });
+    if ( !arrResults ) {
+      arrResults = "<p>No se encontraron articulos con ese nombre</p>"
+    }
     
     return (
-      <div>
-        {arrResults}
+      <div className="pure-g" id="results">
+        <div className="pure-u-3-24"></div>
+        <div className="pure-u-18-24">
+          {arrResults}
+        </div>
       </div>
     );
   }
@@ -131,10 +166,18 @@ class Results extends Component {
 class SingleResult extends Component {
   render() {
     return (
-      <div>
-        <p><strong>{this.props.title}</strong></p>
-        <p>{this.props.extract}</p>
+      <a href={"https://en.wikipedia.org/?curid=" + this.props.pageid}>
+      <div className="singleResult pure-g hvr-fade">
+        
+          <div className="pure-u-1 title">
+            <p><strong>{this.props.title}</strong></p>
+          </div>
+          <div className="pure-u-1 extract">
+            <p>{this.props.extract}</p>
+          </div>
+        
       </div>
+      </a>
     );
   }
 }
