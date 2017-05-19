@@ -107,12 +107,19 @@ class Search extends Component {
 
 class Results extends Component {
   render() {
-    console.log(this.props.results);
+    var results = this.props.results;
+    console.log(results);
+    var arrResults = Object.keys(results).map( function(val) {
+      return results[val];
+    });
+    
+    arrResults = arrResults.map( function(e,i) {
+      return <SingleResult key={e.pageid} extract={e.extract} title={e.title} thumbnail={e.thumbnail}></SingleResult>
+    });
     
     return (
       <div>
-        <p>Results!!</p>
-        <SingleResult></SingleResult>    
+        {arrResults}
       </div>
     );
   }
@@ -124,7 +131,10 @@ class Results extends Component {
 class SingleResult extends Component {
   render() {
     return (
-      <p>single</p>
+      <div>
+        <p><strong>{this.props.title}</strong></p>
+        <p>{this.props.extract}</p>
+      </div>
     );
   }
 }
