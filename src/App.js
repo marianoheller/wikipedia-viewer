@@ -119,7 +119,7 @@ class Search extends Component {
   }
 
   goToRandomArticle() {
-    window.location.replace("https://en.wikipedia.org/wiki/Special:Random"); 
+    window.location.href = "https://en.wikipedia.org/wiki/Special:Random";
   }
 
   render() {
