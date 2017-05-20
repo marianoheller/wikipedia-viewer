@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { debounce } from 'throttle-debounce';
-import logo from './logo.svg';
 import './App.css';
 
 
@@ -44,7 +43,7 @@ class Header extends Component {
     return (
       <div className="App-header pure-g">
         <div className="pure-u-1">
-          <img src={logo} className="App-logo" alt="logo" />
+          <img src="https://cdn.worldvectorlogo.com/logos/react.svg" className="App-logo" alt="logo" />
           <div>
             <div>
               <h2>Wikipedia viewer</h2>
